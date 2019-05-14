@@ -98,4 +98,26 @@ describe.only("/api", () => {
         });
       });
   });
+  describe("/api/articles/:article_id", () => {
+    it("returns article data that belong to a certain article id", () => {
+      return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articleById).to.have.lengthOf(13);
+          expect(body.articleById[0]).to.eql({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            body:
+              "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+            votes: 14,
+            topic: "mitch",
+            author: "butter_bridge",
+            created_at: "2016-11-22T12:36:03.000Z",
+            comment_id: 2,
+            comment_count: "1"
+          });
+        });
+    });
+  });
 });

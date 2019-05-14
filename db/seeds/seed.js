@@ -1,5 +1,8 @@
 const { topicData, userData, articleData, commentData } = require("../data");
 const { createdAtConverter } = require("../../utils/created_at_converter");
+const { lookupArticleId, formatComments } = require("../../utils/lookup");
+const { swapKeys } = require("../../utils/swap_keys");
+
 exports.seed = (knex, Promise) => {
   return knex.migrate
     .rollback()
@@ -16,17 +19,18 @@ exports.seed = (knex, Promise) => {
     })
     .then(userRows => {
       let newArticleData = createdAtConverter(articleData);
+
       return knex("articles")
         .insert(newArticleData)
         .returning("*");
     })
     .then(articleRows => {
       let newCommentData = createdAtConverter(commentData);
-      // chnanging belongs_to to the article id
-      // and then change the key of created_by to author
-
+      let lookupArticle = lookupArticleId(articleRows);
+      let formattedComments = formatComments(newCommentData, lookupArticle);
+      let commentsDB = swapKeys(formattedComments, "created_by", "author");
       return knex("comments")
-        .insert(newCommentData)
+        .insert(commentsDB)
         .returning("*");
     });
 };

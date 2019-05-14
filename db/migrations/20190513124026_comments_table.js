@@ -6,7 +6,9 @@ exports.up = function(knex, Promise) {
     commentsTable.integer("article_id").references("articles.article_id");
     //so the comments table has access to article id,
     commentsTable.integer("votes").defaultTo(0);
-    commentsTable.string("created_at").defaultTo(Date());
+    commentsTable
+      .dateTime("created_at", { precision: 6 })
+      .defaultTo(knex.fn.now(6));
     commentsTable.text("body").notNullable();
   });
 };

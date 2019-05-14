@@ -1,6 +1,10 @@
 exports.createdAtConverter = articlesData => {
   return articlesData.map(article => {
-    let timeStamp = new Date(article.created_at);
+    let timeStamp = new Date(article.created_at)
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
+
     const { created_at, ...restOfKeys } = article;
     restOfKeys.created_at = timeStamp;
     return restOfKeys;

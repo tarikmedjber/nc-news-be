@@ -1,23 +1,41 @@
 const { expect } = require("chai");
-const { lookupArticleId } = require("../utils/lookup");
+const { lookupArticleId, formatComments } = require("../utils/lookup");
+const {
+  articlesData,
+  lookUpTestData,
+  commentsData,
+  exampleReferenceTable,
+  formattedCommentTest
+} = require("../utils/testing_data");
 
-describe.only("lookupArticleId", () => {
+describe("lookupArticleId", () => {
   it("takes in array, returns an object", () => {
     expect(lookupArticleId([])).to.eql({});
   });
   it("takes in an array of an article and returns an object consisting of the id and title", () => {
-    expect(
-      lookupArticleId([
-        {
-          article_id: 1,
-          title: "Running a Node App",
-          topic: "coding",
-          author: "jessjelly",
-          body:
-            "This is part two of a series on how to get up and running with Systemd and Node.js. This part dives deeper into how to successfully run your app with systemd long-term, and how to set it up in a production environment.",
-          created_at: 1471522072389
-        }
-      ])
-    ).to.eql({ title: "Running a Node App", article_id: 1 });
+    let input = [
+      { article_id: 1, title: "Living in the shadow of a great man" }
+    ];
+    expect(lookupArticleId(input)).to.eql({
+      "Living in the shadow of a great man": 1
+    });
+  });
+  it("takes in an array of many articles and returns an object consisting of the id and titles pf each article", () => {
+    let input = articlesData;
+    let expected = lookUpTestData;
+    expect(lookupArticleId(input)).to.eql(expected);
+  });
+});
+
+describe("formatComments", () => {
+  it("returns an array when passed an empty array and an empty object", () => {
+    expect(formatComments([], {})).to.eql([]);
+  });
+  it("returns a comments object containg the article ID and no longer containing belongs_to key", () => {
+    let input1 = commentsData;
+    let input2 = exampleReferenceTable;
+    let expected = formattedCommentTest;
+    expect(formatComments(input1, input2)).to.eql(expected);
+    expect(formatComments(input1, input2)).to.not.equal(input1);
   });
 });

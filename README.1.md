@@ -80,9 +80,9 @@ You should have separate tables for topics, articles, users and comments, and yo
 Your server _must_ have the following endpoints:
 
 ```http
-GET /api/topics
+//GET /api/topics
 
-GET /api/articles
+//GET /api/articles
 
 GET /api/articles/:article_id
 PATCH /api/articles/:article_id
@@ -150,7 +150,7 @@ GET /api/articles
   - `topic`
   - `created_at`
   - `votes`
-  - `comment_count` which is the total count of all the comments with this article_id - you should make use of knex queries in order to achieve this
+  - `comment_count` which is the total count of all the comments with this article_id - you should make use of knex queries in order to achieve this -- leftJoin comments.artice_id as count
 
 #### Should accept queries
 

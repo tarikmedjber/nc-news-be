@@ -5,7 +5,7 @@ const {
   swappedCreatedBy
 } = require("../utils/testing_data");
 
-describe.only("swap_keys", () => {
+describe("swap_keys", () => {
   it("returns an array when passed an array", () => {
     expect(swapKeys([], "created_by", "author")).to.eql([]);
   });

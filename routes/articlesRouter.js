@@ -6,16 +6,22 @@ const {
   getCommentsbyArticleId,
   addNewComment
 } = require("../controllers/articlesController");
+const { methodNotAllowed } = require("../errors/index");
 
-articlesRouter.route("/").get(getArticles);
+articlesRouter
+  .route("/")
+  .get(getArticles)
+  .all(methodNotAllowed);
 articlesRouter
   .route("/:article_id")
   .get(getArticlesById)
-  .patch(updateArticleVotes);
+  .patch(updateArticleVotes)
+  .all(methodNotAllowed);
 
 articlesRouter
   .route("/:article_id/comments")
   .get(getCommentsbyArticleId)
-  .post(addNewComment);
+  .post(addNewComment)
+  .all(methodNotAllowed);
 
 module.exports = { articlesRouter };

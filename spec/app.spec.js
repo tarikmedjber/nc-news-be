@@ -7,7 +7,7 @@ const app = require("../app");
 const connection = require("../db/connection");
 chai.use(chaiSorted);
 
-describe("/api", () => {
+describe.only("/api", () => {
   beforeEach(() => connection.seed.run());
   after(() => connection.destroy());
   describe("/api/topics", () => {
@@ -34,6 +34,7 @@ describe("/api", () => {
         });
     });
   });
+
   describe("/api/articles", () => {
     it("GET status:200, and returns the articles data in descending order of creation", () => {
       return request(app)
@@ -286,55 +287,91 @@ describe("/api", () => {
         });
     });
   });
-});
 
-describe.only("Method Not Allowed - error handling", () => {
-  it("returns a 405 status when a method on the topic endpoint is used that is not allowed", () => {
-    return request(app)
-      .put("/api/topics")
-      .expect(405)
-      .then(({ body }) => {
-        expect(body).to.eql({ msg: "Method Not Allowed" });
+  describe("Error handling", () => {
+    describe("Method Not Allowed - error handling", () => {
+      it("returns a 405 status when a method on the topic endpoint is used that is not allowed", () => {
+        return request(app)
+          .put("/api/topics")
+          .expect(405)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "Method Not Allowed" });
+          });
       });
-  });
-  it("returns a 405 status when a method on the articles endpoint is used that is not allowed", () => {
-    return request(app)
-      .put("/api/articles")
-      .expect(405)
-      .then(({ body }) => {
-        expect(body).to.eql({ msg: "Method Not Allowed" });
+      it("returns a 405 status when a method on the articles endpoint is used that is not allowed", () => {
+        return request(app)
+          .put("/api/articles")
+          .expect(405)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "Method Not Allowed" });
+          });
       });
-  });
-  it("returns a 405 status when a method on the article ID endpoint is used that is not allowed", () => {
-    return request(app)
-      .put("/api/articles/1")
-      .expect(405)
-      .then(({ body }) => {
-        expect(body).to.eql({ msg: "Method Not Allowed" });
+      it("returns a 405 status when a method on the article ID endpoint is used that is not allowed", () => {
+        return request(app)
+          .put("/api/articles/1")
+          .expect(405)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "Method Not Allowed" });
+          });
       });
-  });
-  it("returns a 405 status when a method on the articles-comments endpoint is used that is not allowed", () => {
-    return request(app)
-      .put("/api/articles/1/comments")
-      .expect(405)
-      .then(({ body }) => {
-        expect(body).to.eql({ msg: "Method Not Allowed" });
+      it("returns a 405 status when a method on the articles-comments endpoint is used that is not allowed", () => {
+        return request(app)
+          .put("/api/articles/1/comments")
+          .expect(405)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "Method Not Allowed" });
+          });
       });
-  });
-  it("returns a 405 status when a method on the comment ID endpoint is used that is not allowed", () => {
-    return request(app)
-      .put("/api/comments/1")
-      .expect(405)
-      .then(({ body }) => {
-        expect(body).to.eql({ msg: "Method Not Allowed" });
+      it("returns a 405 status when a method on the comment ID endpoint is used that is not allowed", () => {
+        return request(app)
+          .put("/api/comments/1")
+          .expect(405)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "Method Not Allowed" });
+          });
       });
-  });
-  it("returns a 405 status when a method on the users endpoint is used that is not allowed", () => {
-    return request(app)
-      .put("/api/users/1")
-      .expect(405)
-      .then(({ body }) => {
-        expect(body).to.eql({ msg: "Method Not Allowed" });
+      it("returns a 405 status when a method on the users endpoint is used that is not allowed", () => {
+        return request(app)
+          .put("/api/users/1")
+          .expect(405)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "Method Not Allowed" });
+          });
       });
+    });
+    describe("Bad Request- 400", () => {
+      it("returns status 400 and a message of bad request when given a article_id that does not exist", () => {
+        return request(app)
+          .get("/api/articles/90000")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "Bad request" });
+          });
+      });
+      it("returns status 400 and a message of bad request when given a article_id to update that does not exist", () => {
+        return request(app)
+          .patch("/api/articles/90000")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "Bad request" });
+          });
+      });
+      it("returns status 400 and a message of bad request when given an invalid article_id", () => {
+        return request(app)
+          .get("/api/articles/90000/comments")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "Bad request" });
+          });
+      });
+      it("returns status 400 and a message of bad request when given a article_id to add a comment to", () => {
+        return request(app)
+          .post("/api/articles/900/comments")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "Bad request" });
+          });
+      });
+    });
   });
 });

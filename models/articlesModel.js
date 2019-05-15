@@ -31,14 +31,53 @@ const selectArticles = ({
 
 const selectArticlesById = article_id => {
   return connection
-    .select("*")
+    .select(
+      "articles.author",
+      "title",
+      "articles.article_id",
+      "topic",
+      "articles.body",
+      "articles.created_at",
+      "articles.votes"
+    )
     .count("comments.article_id as comment_count")
     .join("comments", "articles.article_id", "=", "comments.article_id")
-    .groupBy("comments.comment_id")
     .groupBy("articles.article_id")
     .where("articles.article_id", "=", article_id)
-    .from("articles")
+    .from("articles");
+};
+
+const newUpdatedVote = (article_id, votes) => {
+  return connection
+    .increment({ votes })
+    .into("articles")
+    .where({ article_id })
     .returning("*");
 };
 
-module.exports = { selectArticles, selectArticlesById };
+const selectCommentsById = (
+  article_id,
+  { sort_by = "created_at", order = "desc" }
+) => {
+  return connection
+    .select("*")
+    .where({ article_id })
+    .orderBy(sort_by, order)
+    .from("comments")
+    .returning("*");
+};
+
+const postNewComment = newComment => {
+  return connection
+    .into("comments")
+    .insert(newComment)
+    .returning("*");
+};
+
+module.exports = {
+  selectArticles,
+  selectArticlesById,
+  newUpdatedVote,
+  selectCommentsById,
+  postNewComment
+};

@@ -340,7 +340,7 @@ describe.only("/api", () => {
       });
     });
 
-    describe.only("Route not found- 404 for article routes", () => {
+    describe.only("Route not found- 404 for all routes", () => {
       it("returns status 404 and a message of route not found when invalid route is used", () => {
         return request(app)
           .get("/api/NOT_A_ROUTE/")
@@ -378,6 +378,23 @@ describe.only("/api", () => {
         return request(app)
           .post("/api/articles/999/comments")
           .send({ username: "butter_bridge", body: "You only live once!" })
+          .expect(404)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "Route not found!" });
+          });
+      });
+      it("returns status 404 and a message of route not found when invalid comment_id is used to update votes", () => {
+        return request(app)
+          .patch("/api/comments/999/")
+          .send({ votes: 2 })
+          .expect(404)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "Route not found!" });
+          });
+      });
+      it("returns status 404 and a message of route not found when invalid comment_id is used to delete a comment", () => {
+        return request(app)
+          .delete("/api/comments/999")
           .expect(404)
           .then(({ body }) => {
             expect(body).to.eql({ msg: "Route not found!" });

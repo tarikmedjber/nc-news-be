@@ -62,6 +62,8 @@ const selectCommentsById = (
   { sort_by = "created_at", order = "desc" }
 ) => {
   if (order !== "asc" && order !== "desc" && order !== undefined)
+    return Promise.reject({ code: 400 });
+  else
     return connection
       .select("*")
       .where({ article_id })

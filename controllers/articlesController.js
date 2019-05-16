@@ -57,6 +57,7 @@ exports.addNewComment = (req, res, next) => {
   const { article_id } = req.params;
   const { username, body } = req.body;
   const newComment = { article_id, author: username, body };
+
   postNewComment(newComment)
     .then(postedComment => {
       if (postedComment.length < 1)

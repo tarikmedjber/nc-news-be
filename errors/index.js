@@ -8,7 +8,7 @@ exports.handle400 = (err, req, res, next) => {
     "42703": "Bad request",
     400: "Bad Request"
   };
-  if (codes[err.code]) res.status(400).send(err.msg || { msg: "Bad request" });
+  if (codes[err.code]) res.status(400).send({ msg: "Bad request" });
   else next(err);
 };
 

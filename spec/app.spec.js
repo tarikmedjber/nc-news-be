@@ -64,75 +64,76 @@ describe("/api", () => {
           });
         });
     });
-  });
-  it("GET returns status 200 and articles sorted by the article_id key in descending order", () => {
-    return request(app)
-      .get("/api/articles?sort_by=article_id")
-      .expect(200)
-      .then(({ body }) => {
-        expect(body.articles).to.be.descendingBy("article_id");
 
-        expect(body.articles[0]).to.eql({
-          author: "butter_bridge",
-          title: "Moustache",
-          article_id: 12,
-          topic: "mitch",
-          created_at: "1974-11-26T12:21:54.000Z",
-          votes: 0,
-          comment_count: "0"
+    it("GET returns status 200 and articles sorted by the article_id key in descending order", () => {
+      return request(app)
+        .get("/api/articles?sort_by=article_id")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).to.be.descendingBy("article_id");
+
+          expect(body.articles[0]).to.eql({
+            author: "butter_bridge",
+            title: "Moustache",
+            article_id: 12,
+            topic: "mitch",
+            created_at: "1974-11-26T12:21:54.000Z",
+            votes: 0,
+            comment_count: "0"
+          });
         });
-      });
-  });
-  it("GET returns status 200 and articles sorted by article_id and in ascending order", () => {
-    return request(app)
-      .get("/api/articles?sort_by=article_id&order=asc")
-      .expect(200)
-      .then(({ body }) => {
-        expect(body.articles).to.be.ascendingBy("article_id");
-        expect(body.articles[11]).to.eql({
-          author: "butter_bridge",
-          title: "Moustache",
-          article_id: 12,
-          topic: "mitch",
-          created_at: "1974-11-26T12:21:54.000Z",
-          votes: 0,
-          comment_count: "0"
+    });
+    it("GET returns status 200 and articles sorted by article_id and in ascending order", () => {
+      return request(app)
+        .get("/api/articles?sort_by=article_id&order=asc")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).to.be.ascendingBy("article_id");
+          expect(body.articles[11]).to.eql({
+            author: "butter_bridge",
+            title: "Moustache",
+            article_id: 12,
+            topic: "mitch",
+            created_at: "1974-11-26T12:21:54.000Z",
+            votes: 0,
+            comment_count: "0"
+          });
         });
-      });
-  });
-  it("GET returns status 200 and a specific article relating to a username passed in as a query", () => {
-    return request(app)
-      .get("/api/articles?author=butter_bridge")
-      .expect(200)
-      .then(({ body }) => {
-        expect(body.articles).to.have.length(3);
-        expect(body.articles[0]).to.eql({
-          article_id: 1,
-          title: "Living in the shadow of a great man",
-          topic: "mitch",
-          author: "butter_bridge",
-          created_at: "2018-11-15T12:21:54.000Z",
-          votes: 100,
-          comment_count: "13"
+    });
+    it("GET returns status 200 and a specific article relating to a username passed in as a query", () => {
+      return request(app)
+        .get("/api/articles?author=butter_bridge")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).to.have.length(3);
+          expect(body.articles[0]).to.eql({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            created_at: "2018-11-15T12:21:54.000Z",
+            votes: 100,
+            comment_count: "13"
+          });
         });
-      });
-  });
-  it("GET returns status 200 and a specific article relating to a topic passed in as a query", () => {
-    return request(app)
-      .get("/api/articles?topic=mitch")
-      .expect(200)
-      .then(({ body }) => {
-        expect(body.articles).to.have.length(11);
-        expect(body.articles[0]).to.eql({
-          author: "butter_bridge",
-          title: "Living in the shadow of a great man",
-          article_id: 1,
-          topic: "mitch",
-          created_at: "2018-11-15T12:21:54.000Z",
-          votes: 100,
-          comment_count: "13"
+    });
+    it("GET returns status 200 and a specific article relating to a topic passed in as a query", () => {
+      return request(app)
+        .get("/api/articles?topic=mitch")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).to.have.length(11);
+          expect(body.articles[0]).to.eql({
+            author: "butter_bridge",
+            title: "Living in the shadow of a great man",
+            article_id: 1,
+            topic: "mitch",
+            created_at: "2018-11-15T12:21:54.000Z",
+            votes: 100,
+            comment_count: "13"
+          });
         });
-      });
+    });
   });
   describe("/api/articles/:article_id", () => {
     it("GET returns article data that belong to a certain article id", () => {
@@ -243,7 +244,7 @@ describe("/api", () => {
     });
   });
   describe("/api/comments/:comment_id", () => {
-    it("PATCH returns an update vote count", () => {
+    it("PATCH returns status 200 and an updatd vote count", () => {
       return request(app)
         .patch("/api/comments/1")
         .send({ votes: 10 })
@@ -417,7 +418,7 @@ describe("/api", () => {
           });
       });
     });
-    describe("BAD queries, 400 bad request for every endpoint", () => {
+    describe("400 BAD REQUEST for all endpoints", () => {
       it("returns status 400 and message of bad request when given a column to sort by that doesn't exist", () => {
         return request(app)
           .get("/api/articles?sort_by=notAColumn")
@@ -439,10 +440,13 @@ describe("/api", () => {
             expect(error.body).to.eql({ msg: "Bad request" });
           });
       });
-      it.only("returns status 400 and message of bad request when passed an invalid order on the comments endpoint", () => {
+      it("returns status 400 and message of bad request when passed an invalid order on the comments endpoint", () => {
         return request(app)
           .get("/api/articles/1/comments?order=notAscNorDesc")
-          .expect(400);
+          .expect(400)
+          .then(error => {
+            expect(error.body).to.eql({ msg: "Bad request" });
+          });
       });
 
       // it("returns status 200 and message of \this author has no articles", () => {
@@ -450,38 +454,76 @@ describe("/api", () => {
       //     .get("/api/articles?author=lurker")
       //     .expect(200);
       // });
-    });
-  });
-  describe("400 BAD REQUEST for all endpoints", () => {
-    it("Returns status 400 and a message of bad request when given a bad article_id", () => {
-      return request(app)
-        .get("/api/articles/badID")
-        .expect(400)
-        .then(error => {
-          expect(error.body).to.eql({ msg: "Bad request" });
-        });
-    });
-    it("returns status 400 and a message bad request when not given a body to update with", () => {
-      return request(app)
-        .patch("/api/articles/1")
-        .expect(400);
-    });
-    it("returns status 400 and a message bad request when given an invalid body to update with", () => {
-      return request(app)
-        .patch("/api/articles/1")
-        .send({ votes: "3" })
-        .expect(400);
-    });
-    it("returns status 400 and a message bad request when given more than one property", () => {
-      return request(app)
-        .patch("/api/articles/1")
-        .send({ someOther: 1, Property: "too many updates" })
-        .expect(400);
-    });
-    it("returns status 400 and a message bad request when not given a comment to add", () => {
-      return request(app)
-        .post("/api/articles/1/comments")
-        .expect(400);
+
+      it("Returns status 400 and a message of bad request when given a bad article_id", () => {
+        return request(app)
+          .get("/api/articles/badID")
+          .expect(400)
+          .then(error => {
+            expect(error.body).to.eql({ msg: "Bad request" });
+          });
+      });
+
+      it("returns status 400 and a message bad request when not given a body to update with", () => {
+        return request(app)
+          .patch("/api/articles/1")
+          .expect(400)
+          .then(error => {
+            expect(error.body).to.eql({ msg: "Bad request" });
+          });
+      });
+      it("returns status 400 and a message bad request when given an invalid body to update with", () => {
+        return request(app)
+          .patch("/api/articles/1")
+          .send({ votes: "3" })
+          .expect(400)
+          .then(error => {
+            expect(error.body).to.eql({ msg: "Bad request" });
+          });
+      });
+      it("returns status 400 and a message bad request when given more than one property", () => {
+        return request(app)
+          .patch("/api/articles/1")
+          .send({ someOther: 1, Property: "too many updates" })
+          .expect(400)
+          .then(error => {
+            expect(error.body).to.eql({ msg: "Bad request" });
+          });
+      });
+      it("returns status 400 and a message bad request when not given a comment to add", () => {
+        return request(app)
+          .post("/api/articles/1/comments")
+          .expect(400)
+          .then(error => {
+            expect(error.body).to.eql({ msg: "Bad request" });
+          });
+      });
+      it("returns status 400 and a message bad request when given an invalid comment_id", () => {
+        return request(app)
+          .patch("/api/comments/'invalidID'")
+          .send({ votes: 1 })
+          .expect(400)
+          .then(error => {
+            expect(error.body).to.eql({ msg: "Bad request" });
+          });
+      });
+      it("returns status 400 and a message bad request when not provided a new update vote", () => {
+        return request(app)
+          .patch("/api/comments/1")
+          .expect(400)
+          .then(error => {
+            expect(error.body).to.eql({ msg: "Bad request" });
+          });
+      });
+      it("returns status 400 and a message bad request when votes is not a number", () => {
+        return request(app)
+          .patch("/api/comments/1")
+          .send({ votes: "1" })
+          .expect(400)
+          .then(error => {
+            expect(error.body).to.eql({ msg: "Bad request" });
+          });
+      });
     });
   });
 });

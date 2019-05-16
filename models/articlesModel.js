@@ -6,6 +6,8 @@ const selectArticles = ({
   author,
   topic
 }) => {
+  if (order !== "asc" && order !== "desc" && order !== undefined)
+    return Promise.reject({ code: 400 });
   return connection
     .select(
       "articles.author",
@@ -45,23 +47,27 @@ const selectArticlesById = article_id => {
 };
 
 const newUpdatedVote = (article_id, votes) => {
-  return connection
-    .increment({ votes })
-    .into("articles")
-    .where({ article_id })
-    .returning("*");
+  if (typeof votes !== "number")
+    return Promise.reject({ code: 400, msg: "this is not a number" });
+  else
+    return connection
+      .increment({ votes })
+      .into("articles")
+      .where({ article_id })
+      .returning("*");
 };
 
 const selectCommentsById = (
   article_id,
   { sort_by = "created_at", order = "desc" }
 ) => {
-  return connection
-    .select("*")
-    .where({ article_id })
-    .orderBy(sort_by, order)
-    .from("comments")
-    .returning("*");
+  if (order !== "asc" && order !== "desc" && order !== undefined)
+    return connection
+      .select("*")
+      .where({ article_id })
+      .orderBy(sort_by, order)
+      .from("comments")
+      .returning("*");
 };
 
 const postNewComment = newComment => {

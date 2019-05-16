@@ -14,12 +14,12 @@ app.use(express.json());
 
 app.use("/api", apiRouter);
 
-app.all("/*", (req, res) => {
-  res.status(404).send({ msg: "Route not found" });
-});
-
 app.use(handle400);
 app.use(handle404);
 app.use(handle500);
+
+app.all("/*", (req, res) => {
+  res.status(404).send({ msg: "Route not found!" });
+});
 
 module.exports = app;

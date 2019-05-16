@@ -339,37 +339,48 @@ describe.only("/api", () => {
           });
       });
     });
-    describe("Bad Request- 400", () => {
-      it("returns status 400 and a message of bad request when given a article_id that does not exist", () => {
+
+    describe.only("Route not found- 404 for article routes", () => {
+      it("returns status 404 and a message of route not found when invalid route is used", () => {
         return request(app)
-          .get("/api/articles/90000")
-          .expect(400)
+          .get("/api/NOT_A_ROUTE/")
+          .expect(404)
           .then(({ body }) => {
-            expect(body).to.eql({ msg: "Bad request" });
+            expect(body).to.eql({ msg: "Route not found!" });
           });
       });
-      it("returns status 400 and a message of bad request when given a article_id to update that does not exist", () => {
+      it("returns status 404 and a message of route not found when an invalid article_id is used", () => {
         return request(app)
-          .patch("/api/articles/90000")
-          .expect(400)
+          .get("/api/articles/999")
+          .expect(404)
           .then(({ body }) => {
-            expect(body).to.eql({ msg: "Bad request" });
+            expect(body).to.eql({ msg: "Route not found!" });
           });
       });
-      it("returns status 400 and a message of bad request when given an invalid article_id", () => {
+      it("returns status 404 and a message of route not found when invalid article_id is used to update votes", () => {
         return request(app)
-          .get("/api/articles/90000/comments")
-          .expect(400)
+          .patch("/api/articles/999")
+          .send({ votes: 2 })
+          .expect(404)
           .then(({ body }) => {
-            expect(body).to.eql({ msg: "Bad request" });
+            expect(body).to.eql({ msg: "Route not found!" });
           });
       });
-      it("returns status 400 and a message of bad request when given a article_id to add a comment to", () => {
+      it("returns status 404 and a message of route not found when an invalid article_id is used to get comments", () => {
         return request(app)
-          .post("/api/articles/900/comments")
-          .expect(400)
+          .get("/api/articles/999/comments")
+          .expect(404)
           .then(({ body }) => {
-            expect(body).to.eql({ msg: "Bad request" });
+            expect(body).to.eql({ msg: "Route not found!" });
+          });
+      });
+      it("returns status 404 and a message of route not found when invalid article_id is used to add a comment", () => {
+        return request(app)
+          .post("/api/articles/999/comments")
+          .send({ username: "butter_bridge", body: "You only live once!" })
+          .expect(404)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "Route not found!" });
           });
       });
     });

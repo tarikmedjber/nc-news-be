@@ -23,9 +23,6 @@ const selectArticles = ({
     .where(query => {
       if (author) query.where("articles.author", "=", author);
       if (topic) query.where({ topic });
-    })
-    .then(articles => {
-      return articles;
     });
 };
 

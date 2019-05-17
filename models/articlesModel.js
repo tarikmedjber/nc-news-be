@@ -43,14 +43,16 @@ const selectArticlesById = article_id => {
     .join("comments", "articles.article_id", "=", "comments.article_id")
     .groupBy("articles.article_id")
     .where("articles.article_id", "=", article_id)
-    .from("articles");
+    .from("articles")
+    .first()
+    .returning("*");
 };
 
-const newUpdatedVote = (article_id, votes) => {
+const newUpdatedVote = (article_id, votes = 0) => {
   if (typeof votes !== "number")
     return Promise.reject({ code: 400, msg: "this is not a number" });
   else
-    return connection
+    return connection("articles")
       .increment({ votes })
       .into("articles")
       .where({ article_id })

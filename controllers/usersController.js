@@ -3,13 +3,13 @@ const { selectUsersByUsername } = require("../models/usersModel");
 exports.getUsersByUsername = (req, res, next) => {
   const { username } = req.params;
   selectUsersByUsername(username)
-    .then(users => {
-      if (users.length < 1)
+    .then(([user]) => {
+      if (user.length < 1)
         return Promise.reject({
           code: 404,
           msg: "404 - Route not found!"
         });
-      res.status(200).send({ users });
+      res.status(200).send({ user });
     })
     .catch(next);
 };

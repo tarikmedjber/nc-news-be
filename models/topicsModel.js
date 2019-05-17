@@ -6,4 +6,12 @@ const selectTopics = () => {
     .returning("*");
 };
 
-module.exports = { selectTopics };
+const selectTopicsBySlug = topic => {
+  return connection
+    .select("topics")
+    .from("topics")
+    .where("slug", topic)
+    .returning("*");
+};
+
+module.exports = { selectTopics, selectTopicsBySlug };

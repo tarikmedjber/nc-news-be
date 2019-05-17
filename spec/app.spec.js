@@ -7,7 +7,7 @@ const app = require("../app");
 const connection = require("../db/connection");
 chai.use(chaiSorted);
 
-describe("/api", () => {
+describe.only("/api", () => {
   beforeEach(() => connection.seed.run());
   after(() => connection.destroy());
   describe("/api/topics", () => {
@@ -32,6 +32,11 @@ describe("/api", () => {
             }
           ]);
         });
+    });
+    it("returns a specific topic when passed a topic- 200 OK", () => {
+      return request(app)
+        .get("/api/topics/paper")
+        .expect(200);
     });
   });
 
@@ -134,6 +139,16 @@ describe("/api", () => {
           });
         });
     });
+    it("returns status 200 OK when the author exists but has no articles", () => {
+      return request(app)
+        .get("/api/articles?author=lurker")
+        .expect(200);
+    });
+    it("returns status 200 OK when the topic exists but has no articles", () => {
+      return request(app)
+        .get("/api/articles?topic=paper")
+        .expect(200);
+    });
   });
   describe("/api/articles/:article_id", () => {
     it("GET returns article data that belong to a certain article id", () => {
@@ -141,18 +156,16 @@ describe("/api", () => {
         .get("/api/articles/1")
         .expect(200)
         .then(({ body }) => {
-          expect(body.articleById).to.eql([
-            {
-              author: "butter_bridge",
-              title: "Living in the shadow of a great man",
-              article_id: 1,
-              topic: "mitch",
-              body: "I find this existence challenging",
-              created_at: "2018-11-15T12:21:54.000Z",
-              votes: 100,
-              comment_count: "13"
-            }
-          ]);
+          expect(body.article).to.eql({
+            author: "butter_bridge",
+            title: "Living in the shadow of a great man",
+            article_id: 1,
+            topic: "mitch",
+            body: "I find this existence challenging",
+            created_at: "2018-11-15T12:21:54.000Z",
+            votes: 100,
+            comment_count: "13"
+          });
         });
     });
     it("PATCH returns an updated votes value within a particular article", () => {
@@ -161,17 +174,32 @@ describe("/api", () => {
         .send({ votes: 22 })
         .expect(201)
         .then(({ body }) => {
-          expect(body).to.eql([
-            {
-              author: "butter_bridge",
-              title: "Living in the shadow of a great man",
-              article_id: 1,
-              body: "I find this existence challenging",
-              topic: "mitch",
-              created_at: "2018-11-15T12:21:54.000Z",
-              votes: 122
-            }
-          ]);
+          expect(body.article).to.eql({
+            author: "butter_bridge",
+            title: "Living in the shadow of a great man",
+            article_id: 1,
+            body: "I find this existence challenging",
+            topic: "mitch",
+            created_at: "2018-11-15T12:21:54.000Z",
+            votes: 122
+          });
+        });
+    });
+    it("returns status 200  when not given a body to update with", () => {
+      return request(app)
+        .patch("/api/articles/1")
+
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.article).to.eql({
+            author: "butter_bridge",
+            title: "Living in the shadow of a great man",
+            article_id: 1,
+            body: "I find this existence challenging",
+            topic: "mitch",
+            created_at: "2018-11-15T12:21:54.000Z",
+            votes: 100
+          });
         });
     });
   });
@@ -181,9 +209,9 @@ describe("/api", () => {
         .get("/api/articles/1/comments")
         .expect(200)
         .then(({ body }) => {
-          expect(body.commentsByArticleId).to.be.descendingBy("created_at");
-          expect(body.commentsByArticleId).to.have.lengthOf(13);
-          expect(body.commentsByArticleId[0]).to.eql({
+          expect(body.comments).to.be.descendingBy("created_at");
+          expect(body.comments).to.have.lengthOf(13);
+          expect(body.comments[0]).to.eql({
             comment_id: 2,
             author: "butter_bridge",
             article_id: 1,
@@ -194,13 +222,21 @@ describe("/api", () => {
           });
         });
     });
+    // it.only("GET 200 an empty array when passed a article ID which has no comments", () => {
+    //   return request(app)
+    //     .get("/api/articles/2/comments")
+    //     .expect(200)
+    //     .then(({ body }) => {
+    //       console.log(body);
+    //     });
+    // });
     it("GET returns status 200 and comments sorted by the votes key in descending order", () => {
       return request(app)
         .get("/api/articles/1/comments?sort_by=votes")
         .expect(200)
         .then(({ body }) => {
-          expect(body.commentsByArticleId).to.be.descendingBy("votes");
-          expect(body.commentsByArticleId[12]).to.eql({
+          expect(body.comments).to.be.descendingBy("votes");
+          expect(body.comments[12]).to.eql({
             comment_id: 4,
             author: "icellusedkars",
             article_id: 1,
@@ -215,8 +251,8 @@ describe("/api", () => {
         .get("/api/articles/1/comments?sort_by=votes&order=asc")
         .expect(200)
         .then(({ body }) => {
-          expect(body.commentsByArticleId).to.be.ascendingBy("votes");
-          expect(body.commentsByArticleId[0]).to.eql({
+          expect(body.comments).to.be.ascendingBy("votes");
+          expect(body.comments[0]).to.eql({
             comment_id: 4,
             author: "icellusedkars",
             article_id: 1,
@@ -232,7 +268,7 @@ describe("/api", () => {
         .send({ username: "butter_bridge", body: "You only live once!" })
         .expect(201)
         .then(({ body }) => {
-          expect(body.postedComment[0]).to.have.keys(
+          expect(body.comment).to.have.keys(
             "comment_id",
             "author",
             "article_id",
@@ -250,17 +286,31 @@ describe("/api", () => {
         .send({ votes: 10 })
         .expect(200)
         .then(({ body }) => {
-          expect(body).to.eql([
-            {
-              comment_id: 1,
-              author: "butter_bridge",
-              article_id: 9,
-              votes: 26,
-              created_at: "2017-11-22T12:36:03.000Z",
-              body:
-                "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
-            }
-          ]);
+          expect(body).to.eql({
+            comment_id: 1,
+            author: "butter_bridge",
+            article_id: 9,
+            votes: 26,
+            created_at: "2017-11-22T12:36:03.000Z",
+            body:
+              "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+          });
+        });
+    });
+    it("returns status 200 OK when not provided a new update vote", () => {
+      return request(app)
+        .patch("/api/comments/1")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).to.eql({
+            comment_id: 1,
+            author: "butter_bridge",
+            article_id: 9,
+            votes: 16,
+            created_at: "2017-11-22T12:36:03.000Z",
+            body:
+              "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+          });
         });
     });
     it("DELETES a specific comment based on its comment_id", () => {
@@ -273,13 +323,12 @@ describe("/api", () => {
     });
   });
   describe("/api/users/:username", () => {
-    it("GET returns status 200, and geta specific user by username", () => {
+    it.only("GET returns status 200, and geta specific user by username", () => {
       return request(app)
         .get("/api/users/butter_bridge")
         .expect(200)
         .then(({ body }) => {
-          expect(body.users).to.have.lengthOf(1);
-          expect(body.users[0]).to.eql({
+          expect(body.user).to.eql({
             username: "butter_bridge",
             name: "jonny",
             avatar_url:
@@ -290,7 +339,7 @@ describe("/api", () => {
   });
 
   describe("Error handling", () => {
-    describe("Method Not Allowed 405 - error handling", () => {
+    describe("Method Not Allowed 405 for all endpoints", () => {
       it("returns a 405 status when a method on the topic endpoint is used that is not allowed", () => {
         return request(app)
           .put("/api/topics")
@@ -341,7 +390,7 @@ describe("/api", () => {
       });
     });
 
-    describe("Route not found- 404 for all routes", () => {
+    describe("Route not found- 404 for all endpoints", () => {
       it("returns status 404 and a message of route not found when invalid route is used", () => {
         return request(app)
           .get("/api/NOT_A_ROUTE/")
@@ -350,7 +399,7 @@ describe("/api", () => {
             expect(body).to.eql({ msg: "404 - Route not found!" });
           });
       });
-      it("returns status 404 and a message of route not found when an invalid article_id is used", () => {
+      it("returns status 404 and a message of route not found when an article_id that doesnt exist is used", () => {
         return request(app)
           .get("/api/articles/999")
           .expect(404)
@@ -358,7 +407,7 @@ describe("/api", () => {
             expect(body).to.eql({ msg: "404 - Route not found!" });
           });
       });
-      it("returns status 404 and a message of route not found when invalid article_id is used to update votes", () => {
+      it("returns status 404 and a message of route not found when an article_id that does not exist is used to update votes", () => {
         return request(app)
           .patch("/api/articles/999")
           .send({ votes: 2 })
@@ -367,7 +416,7 @@ describe("/api", () => {
             expect(body).to.eql({ msg: "404 - Route not found!" });
           });
       });
-      it("returns status 404 and a message of route not found when an invalid article_id is used to get comments", () => {
+      it("returns status 404 and a message of route not found when an article_id that does not exist is used to get comments", () => {
         return request(app)
           .get("/api/articles/999/comments")
           .expect(404)
@@ -375,7 +424,7 @@ describe("/api", () => {
             expect(body).to.eql({ msg: "404 - Route not found!" });
           });
       });
-      it("returns status 404 and a message of route not found when invalid article_id is used to add a comment", () => {
+      it("returns status 404 and a message of route not found when an article_id that does not exist is used to add a comment", () => {
         return request(app)
           .post("/api/articles/999/comments")
           .send({ username: "butter_bridge", body: "You only live once!" })
@@ -384,16 +433,8 @@ describe("/api", () => {
             expect(body).to.eql({ msg: "404 - Route not found!" });
           });
       });
-      it("returns status 404 and a message of route not found when invalid comment_id is used to update votes", () => {
-        return request(app)
-          .patch("/api/comments/99999")
-          .send({ votes: 2 })
-          .expect(404)
-          .then(({ body }) => {
-            expect(body).to.eql({ msg: "404 - Route not found!" });
-          });
-      });
-      it("returns status 404 and a message of route not found when invalid comment_id is used to delete a comment", () => {
+
+      it("returns status 404 and a message of route not found when a comment_id that does not exist is used to delete a comment", () => {
         return request(app)
           .delete("/api/comments/999")
           .expect(404)
@@ -409,7 +450,7 @@ describe("/api", () => {
             expect(body).to.eql({ msg: "404 - Route not found!" });
           });
       });
-      it("returns status 404 and message of bad request when an author or topic that does not exist", () => {
+      it("returns status 404 and message of bad request when an author or topic that does not exist is used", () => {
         return request(app)
           .get("/api/articles?author=DOESnotEXIST")
           .expect(404)
@@ -418,7 +459,7 @@ describe("/api", () => {
           });
       });
     });
-    describe("400 BAD REQUEST for all endpoints", () => {
+    describe("400 bad request for all endpoints", () => {
       it("returns status 400 and message of bad request when given a column to sort by that doesn't exist", () => {
         return request(app)
           .get("/api/articles?sort_by=notAColumn")
@@ -430,7 +471,10 @@ describe("/api", () => {
       it("returns status 400 and message of bad request when passed an invalid order", () => {
         return request(app)
           .get("/api/articles?order=notAscNorDesc")
-          .expect(400);
+          .expect(400)
+          .then(error => {
+            expect(error.body).to.eql({ msg: "Bad request" });
+          });
       });
       it("returns status 400 and message of bad request when given a column to sort by that doesn't exist on the comments endpoint", () => {
         return request(app)
@@ -449,12 +493,6 @@ describe("/api", () => {
           });
       });
 
-      // it("returns status 200 and message of \this author has no articles", () => {
-      //   return request(app)
-      //     .get("/api/articles?author=lurker")
-      //     .expect(200);
-      // });
-
       it("Returns status 400 and a message of bad request when given a bad article_id", () => {
         return request(app)
           .get("/api/articles/badID")
@@ -464,14 +502,6 @@ describe("/api", () => {
           });
       });
 
-      it("returns status 400 and a message bad request when not given a body to update with", () => {
-        return request(app)
-          .patch("/api/articles/1")
-          .expect(400)
-          .then(error => {
-            expect(error.body).to.eql({ msg: "Bad request" });
-          });
-      });
       it("returns status 400 and a message bad request when given an invalid body to update with", () => {
         return request(app)
           .patch("/api/articles/1")
@@ -481,18 +511,28 @@ describe("/api", () => {
             expect(error.body).to.eql({ msg: "Bad request" });
           });
       });
-      it("returns status 400 and a message bad request when given more than one property", () => {
+      it("returns status 400 and a message of route not found when a comment_id that does not exist is used to update votes", () => {
         return request(app)
-          .patch("/api/articles/1")
-          .send({ someOther: 1, Property: "too many updates" })
+          .patch("/api/comments/99999")
+          .send({ votes: 2 })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "Bad request" });
+          });
+      });
+
+      it("returns status 400 and a message bad request when not given a comment to add", () => {
+        return request(app)
+          .post("/api/articles/1/comments")
           .expect(400)
           .then(error => {
             expect(error.body).to.eql({ msg: "Bad request" });
           });
       });
-      it("returns status 400 and a message bad request when not given a comment to add", () => {
+      it("returns status 400 and a message bad request when not provided all the article columns", () => {
         return request(app)
           .post("/api/articles/1/comments")
+          .send({ username: "lurker" })
           .expect(400)
           .then(error => {
             expect(error.body).to.eql({ msg: "Bad request" });
@@ -507,14 +547,7 @@ describe("/api", () => {
             expect(error.body).to.eql({ msg: "Bad request" });
           });
       });
-      it("returns status 400 and a message bad request when not provided a new update vote", () => {
-        return request(app)
-          .patch("/api/comments/1")
-          .expect(400)
-          .then(error => {
-            expect(error.body).to.eql({ msg: "Bad request" });
-          });
-      });
+
       it("returns status 400 and a message bad request when votes is not a number", () => {
         return request(app)
           .patch("/api/comments/1")

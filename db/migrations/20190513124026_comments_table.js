@@ -3,7 +3,6 @@ exports.up = function(knex, Promise) {
     commentsTable.increments("comment_id").primary();
     commentsTable.string("author").references("users.username");
     commentsTable.integer("article_id").references("articles.article_id");
-    //so the comments table has access to article id,
     commentsTable.integer("votes").defaultTo(0);
     commentsTable
       .dateTime("created_at", { precision: 6 })
@@ -11,8 +10,6 @@ exports.up = function(knex, Promise) {
     commentsTable.text("body").notNullable();
   });
 };
-//the others worked with references
-// why cant we just change author to the created_by
 
 exports.down = function(knex, Promise) {
   return knex.schema.dropTable("comments");

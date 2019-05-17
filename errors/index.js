@@ -13,7 +13,6 @@ exports.handle400 = (err, req, res, next) => {
 };
 
 exports.handle404 = (err, req, res, next) => {
-  console.log(err.msg);
   const codes = {
     "23503": "violates foreign key constraint",
     404: "404 - Route not found!"

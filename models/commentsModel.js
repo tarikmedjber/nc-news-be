@@ -1,6 +1,6 @@
 const connection = require("../db/connection");
 
-const patchCommentVotes = (comment_id, votes) => {
+const patchCommentVotes = (comment_id, votes = 0) => {
   if (typeof votes !== "number") return Promise.reject({ code: 400 });
   return connection
     .increment({ votes })

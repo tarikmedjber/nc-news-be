@@ -4,10 +4,9 @@ exports.updateCommentVotes = (req, res, next) => {
   const { comment_id } = req.params;
   const { votes } = req.body;
   patchCommentVotes(comment_id, votes)
-    .then(updatedCommentVote => {
-      if (updatedCommentVote.length < 1)
-        return Promise.reject({ code: 404, msg: "404 - ID is invalid" });
-      res.status(200).send(updatedCommentVote);
+    .then(([comment]) => {
+      if (!comment) return Promise.reject({ code: 400 });
+      res.status(200).send(comment);
     })
     .catch(next);
 };

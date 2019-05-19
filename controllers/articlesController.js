@@ -55,18 +55,20 @@ exports.updateArticleVotes = (req, res, next) => {
     .then(([article]) => {
       if (!article)
         return Promise.reject({ code: 404, msg: "404 - Route not found!" });
-      else res.status(201).send({ article });
+      else res.status(200).send({ article });
     })
     .catch(next);
 };
 
 exports.getCommentsbyArticleId = (req, res, next) => {
   const { article_id } = req.params;
-  selectCommentsById(article_id, req.query)
+  selectArticlesById(article_id)
+    .then(articles => {
+      if (articles !== null && !articles) return Promise.reject({ code: 404 });
+      else return selectCommentsById(article_id, req.query);
+    })
     .then(comments => {
-      if (comments.length < 1)
-        return Promise.reject({ code: 404, msg: "404 - Route not found!" });
-      else res.status(200).send({ comments });
+      res.status(200).send({ comments });
     })
     .catch(next);
 };

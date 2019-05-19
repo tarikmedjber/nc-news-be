@@ -1,0 +1,16 @@
+{
+  "GET": [
+    "/api/topics",
+    " /api/articles",
+    "/api/articles/:article_id",
+    "/api/articles/:article_id/comments",
+    "/api/users/:username",
+    "/api"
+  ],
+
+  "PATCH": ["/api/articles/:article_id", "/api/comments/:comment_id"],
+
+  "POST": " /api/articles/:article_id/comments",
+
+  "DELETE": " /api/comments/:comment_id"
+}

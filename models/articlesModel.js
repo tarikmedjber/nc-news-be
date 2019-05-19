@@ -40,7 +40,7 @@ const selectArticlesById = article_id => {
       "articles.votes"
     )
     .count("comments.article_id as comment_count")
-    .join("comments", "articles.article_id", "=", "comments.article_id")
+    .leftJoin("comments", "articles.article_id", "=", "comments.article_id")
     .groupBy("articles.article_id")
     .where("articles.article_id", "=", article_id)
     .from("articles")
@@ -49,14 +49,13 @@ const selectArticlesById = article_id => {
 };
 
 const newUpdatedVote = (article_id, votes = 0) => {
-  if (typeof votes !== "number")
-    return Promise.reject({ code: 400, msg: "this is not a number" });
-  else
+  if (typeof votes == "number" || !votes)
     return connection("articles")
       .increment({ votes })
       .into("articles")
       .where({ article_id })
       .returning("*");
+  else return Promise.reject({ code: 400, msg: "this is not a number" });
 };
 
 const selectCommentsById = (

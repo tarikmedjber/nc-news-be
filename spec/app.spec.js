@@ -172,7 +172,7 @@ describe.only("/api", () => {
       return request(app)
         .patch("/api/articles/1")
         .send({ votes: 22 })
-        .expect(201)
+        .expect(200)
         .then(({ body }) => {
           expect(body.article).to.eql({
             author: "butter_bridge",
@@ -185,11 +185,10 @@ describe.only("/api", () => {
           });
         });
     });
-    it("returns status 200  when not given a body to update with", () => {
+    it("returns status 200 when not given a vote to update with", () => {
       return request(app)
         .patch("/api/articles/1")
-
-        .expect(201)
+        .expect(200)
         .then(({ body }) => {
           expect(body.article).to.eql({
             author: "butter_bridge",
@@ -222,14 +221,12 @@ describe.only("/api", () => {
           });
         });
     });
-    // it.only("GET 200 an empty array when passed a article ID which has no comments", () => {
-    //   return request(app)
-    //     .get("/api/articles/2/comments")
-    //     .expect(200)
-    //     .then(({ body }) => {
-    //       console.log(body);
-    //     });
-    // });
+    it("GET 200 an empty array when passed a article ID which has no comments", () => {
+      return request(app)
+        .get("/api/articles/2/comments")
+        .expect(200)
+        .then(({ body }) => {});
+    });
     it("GET returns status 200 and comments sorted by the votes key in descending order", () => {
       return request(app)
         .get("/api/articles/1/comments?sort_by=votes")
@@ -265,7 +262,7 @@ describe.only("/api", () => {
     it("POST returns a new comment into the selected article", () => {
       return request(app)
         .post("/api/articles/1/comments")
-        .send({ username: "butter_bridge", body: "You only live once!" })
+        .send({ username: "lurker", body: "You only live once!" })
         .expect(201)
         .then(({ body }) => {
           expect(body.comment).to.have.keys(
@@ -286,7 +283,7 @@ describe.only("/api", () => {
         .send({ votes: 10 })
         .expect(200)
         .then(({ body }) => {
-          expect(body).to.eql({
+          expect(body.comment).to.eql({
             comment_id: 1,
             author: "butter_bridge",
             article_id: 9,
@@ -302,7 +299,7 @@ describe.only("/api", () => {
         .patch("/api/comments/1")
         .expect(200)
         .then(({ body }) => {
-          expect(body).to.eql({
+          expect(body.comment).to.eql({
             comment_id: 1,
             author: "butter_bridge",
             article_id: 9,
@@ -323,7 +320,7 @@ describe.only("/api", () => {
     });
   });
   describe("/api/users/:username", () => {
-    it.only("GET returns status 200, and geta specific user by username", () => {
+    it("GET returns status 200, and geta specific user by username", () => {
       return request(app)
         .get("/api/users/butter_bridge")
         .expect(200)
@@ -340,6 +337,14 @@ describe.only("/api", () => {
 
   describe("Error handling", () => {
     describe("Method Not Allowed 405 for all endpoints", () => {
+      it("returns status 405 method not allowed when any request bu GET is used on the API endpoint", () => {
+        return request(app)
+          .delete("/api")
+          .expect(405)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "Method Not Allowed" });
+          });
+      });
       it("returns a 405 status when a method on the topic endpoint is used that is not allowed", () => {
         return request(app)
           .put("/api/topics")
@@ -442,6 +447,15 @@ describe.only("/api", () => {
             expect(body).to.eql({ msg: "404 - Route not found!" });
           });
       });
+      it("returns status 404 and a message of route not found when a comment_id that does not exist is used to update votes", () => {
+        return request(app)
+          .patch("/api/comments/99999")
+          .send({ votes: 2 })
+          .expect(404)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "404 - Route not found!" });
+          });
+      });
       it("returns status 404 and a message of route not found when a username that does not exist is used", () => {
         return request(app)
           .get("/api/users/invalid_username")
@@ -511,15 +525,6 @@ describe.only("/api", () => {
             expect(error.body).to.eql({ msg: "Bad request" });
           });
       });
-      it("returns status 400 and a message of route not found when a comment_id that does not exist is used to update votes", () => {
-        return request(app)
-          .patch("/api/comments/99999")
-          .send({ votes: 2 })
-          .expect(400)
-          .then(({ body }) => {
-            expect(body).to.eql({ msg: "Bad request" });
-          });
-      });
 
       it("returns status 400 and a message bad request when not given a comment to add", () => {
         return request(app)
@@ -551,7 +556,7 @@ describe.only("/api", () => {
       it("returns status 400 and a message bad request when votes is not a number", () => {
         return request(app)
           .patch("/api/comments/1")
-          .send({ votes: "1" })
+          .send({ votes: "cat" })
           .expect(400)
           .then(error => {
             expect(error.body).to.eql({ msg: "Bad request" });

@@ -4,7 +4,7 @@ exports.getUsersByUsername = (req, res, next) => {
   const { username } = req.params;
   selectUsersByUsername(username)
     .then(([user]) => {
-      if (user.length < 1)
+      if (!user)
         return Promise.reject({
           code: 404,
           msg: "404 - Route not found!"

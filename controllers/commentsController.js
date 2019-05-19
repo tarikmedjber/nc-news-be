@@ -5,8 +5,8 @@ exports.updateCommentVotes = (req, res, next) => {
   const { votes } = req.body;
   patchCommentVotes(comment_id, votes)
     .then(([comment]) => {
-      if (!comment) return Promise.reject({ code: 400 });
-      res.status(200).send(comment);
+      if (!comment) return Promise.reject({ code: 404 });
+      res.status(200).send({ comment });
     })
     .catch(next);
 };

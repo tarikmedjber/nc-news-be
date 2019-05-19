@@ -171,7 +171,7 @@ describe.only("/api", () => {
     it("PATCH returns an updated votes value within a particular article", () => {
       return request(app)
         .patch("/api/articles/1")
-        .send({ votes: 22 })
+        .send({ votes: 1 })
         .expect(200)
         .then(({ body }) => {
           expect(body.article).to.eql({
@@ -181,7 +181,7 @@ describe.only("/api", () => {
             body: "I find this existence challenging",
             topic: "mitch",
             created_at: "2018-11-15T12:21:54.000Z",
-            votes: 122
+            votes: 101
           });
         });
     });
@@ -225,7 +225,9 @@ describe.only("/api", () => {
       return request(app)
         .get("/api/articles/2/comments")
         .expect(200)
-        .then(({ body }) => {});
+        .then(({ body }) => {
+          expect(body.comments).to.eql([]);
+        });
     });
     it("GET returns status 200 and comments sorted by the votes key in descending order", () => {
       return request(app)

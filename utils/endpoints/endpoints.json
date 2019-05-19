@@ -1,16 +1,19 @@
 {
   "GET": [
-    "/api/topics",
-    " /api/articles",
-    "/api/articles/:article_id",
-    "/api/articles/:article_id/comments",
-    "/api/users/:username",
-    "/api"
+    "/api/topics -retrieves all topics  ",
+    " /api/articles -retrieves all articles",
+    "/api/articles/:article_id -retrieves articles of a given ID",
+    "/api/articles/:article_id/comments -retrieves comments on one article",
+    "/api/users/:username -retrievs a certain user",
+    "/api - describes all endpoints on the website"
   ],
 
-  "PATCH": ["/api/articles/:article_id", "/api/comments/:comment_id"],
+  "PATCH": [
+    "/api/articles/:article_id - updates the votes on the specific article",
+    "/api/comments/:comment_id - updates the votes on the specific comment"
+  ],
 
-  "POST": " /api/articles/:article_id/comments",
+  "POST": " /api/articles/:article_id/comments -adds a new comment to an article",
 
-  "DELETE": " /api/comments/:comment_id"
+  "DELETE": " /api/comments/:comment_id - deletes a comment"
 }

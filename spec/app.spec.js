@@ -46,7 +46,7 @@ describe.only("/api", () => {
         .get("/api/articles")
         .expect(200)
         .then(({ body }) => {
-          expect(body.articles).to.have.lengthOf(12);
+          expect(body.articles).to.have.lengthOf(10);
           expect(body.articles).to.be.descendingBy("created_at");
           expect(body.articles[0]).to.contain.keys(
             "author",
@@ -94,12 +94,12 @@ describe.only("/api", () => {
         .expect(200)
         .then(({ body }) => {
           expect(body.articles).to.be.ascendingBy("article_id");
-          expect(body.articles[11]).to.eql({
-            author: "butter_bridge",
-            title: "Moustache",
-            article_id: 12,
+          expect(body.articles[9]).to.eql({
+            author: "rogersop",
+            title: "Seven inspirational thought leaders from Manchester UK",
+            article_id: 10,
             topic: "mitch",
-            created_at: "1974-11-26T12:21:54.000Z",
+            created_at: "1982-11-24T12:21:54.000Z",
             votes: 0,
             comment_count: "0"
           });
@@ -127,7 +127,7 @@ describe.only("/api", () => {
         .get("/api/articles?topic=mitch")
         .expect(200)
         .then(({ body }) => {
-          expect(body.articles).to.have.length(11);
+          expect(body.articles).to.have.length(10);
           expect(body.articles[0]).to.eql({
             author: "butter_bridge",
             title: "Living in the shadow of a great man",

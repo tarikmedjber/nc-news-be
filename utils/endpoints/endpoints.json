@@ -1,6 +1,6 @@
 {
   "GET": [
-    "/api/topics -retrieves all topics  ",
+    "/api/topics -retrieves all topics",
     " /api/articles -retrieves all articles",
     "/api/articles/:article_id -retrieves articles of a given ID",
     "/api/articles/:article_id/comments -retrieves comments on one article",

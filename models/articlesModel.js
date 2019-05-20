@@ -4,7 +4,9 @@ const selectArticles = ({
   sort_by = "created_at",
   order = "desc",
   author,
-  topic
+  topic,
+  p = 1,
+  limit = 10
 }) => {
   if (order !== "asc" && order !== "desc" && order !== undefined)
     return Promise.reject({ code: 400 });
@@ -22,6 +24,8 @@ const selectArticles = ({
     .groupBy("articles.article_id")
     .from("articles")
     .orderBy(sort_by, order)
+    .limit(limit)
+    .offset((p - 1) * 10)
     .where(query => {
       if (author) query.where("articles.author", "=", author);
       if (topic) query.where({ topic });

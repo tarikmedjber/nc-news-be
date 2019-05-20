@@ -217,7 +217,7 @@ describe.only("/api", () => {
         .expect(200)
         .then(({ body }) => {
           expect(body.comments).to.be.descendingBy("created_at");
-          expect(body.comments).to.have.lengthOf(13);
+          expect(body.comments).to.have.lengthOf(10);
           expect(body.comments[0]).to.eql({
             comment_id: 2,
             author: "butter_bridge",
@@ -229,12 +229,12 @@ describe.only("/api", () => {
           });
         });
     });
-    it("GET status 200, accepts a p query with a default limit of 10 returns 10 comments for a particular article", () => {
+    it("GET status 200, accepts a p query with a default limit of 10 returns 10 comments", () => {
       return request(app)
-        .get("/api/articles?p=1")
+        .get("/api/articles/1/comments?p=2")
         .expect(200)
         .then(({ body }) => {
-          expect(body.articles).to.have.lengthOf(10);
+          expect(body.comments).to.have.lengthOf(3);
         });
     });
     it("GET 200 an empty array when passed a article ID which has no comments", () => {
@@ -251,13 +251,14 @@ describe.only("/api", () => {
         .expect(200)
         .then(({ body }) => {
           expect(body.comments).to.be.descendingBy("votes");
-          expect(body.comments[12]).to.eql({
-            comment_id: 4,
+          expect(body.comments[0]).to.eql({
+            comment_id: 3,
             author: "icellusedkars",
             article_id: 1,
-            votes: -100,
-            created_at: "2014-11-23T12:36:03.000Z",
-            body: " I carry a log — yes. Is it funny to you? It is not to me."
+            votes: 100,
+            created_at: "2015-11-23T12:36:03.000Z",
+            body:
+              "Replacing the quiet elegance of the dark suit and tie with the casual indifference of these muted earth tones is a form of fashion suicide, but, uh, call me crazy — onyou it works."
           });
         });
     });

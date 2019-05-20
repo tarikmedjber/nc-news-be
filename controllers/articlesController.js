@@ -51,13 +51,19 @@ exports.getArticlesById = (req, res, next) => {
 exports.updateArticleVotes = (req, res, next) => {
   const { votes } = req.body;
   const { article_id } = req.params;
-  newUpdatedVote(article_id, votes)
-    .then(([article]) => {
-      if (!article)
-        return Promise.reject({ code: 404, msg: "404 - Route not found!" });
-      else res.status(200).send({ article });
-    })
-    .catch(next);
+  if (
+    !Object.keys(req.body).includes("votes") &&
+    Object.keys(req.body).length > 0
+  )
+    next({ code: 400 });
+  else
+    newUpdatedVote(article_id, votes)
+      .then(([article]) => {
+        if (!article)
+          return Promise.reject({ code: 404, msg: "404 - Route not found!" });
+        else res.status(200).send({ article });
+      })
+      .catch(next);
 };
 
 exports.getCommentsbyArticleId = (req, res, next) => {

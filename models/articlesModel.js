@@ -25,7 +25,7 @@ const selectArticles = ({
     .from("articles")
     .orderBy(sort_by, order)
     .limit(limit)
-    .offset((p - 1) * 10)
+    .offset((p - 1) * limit)
     .where(query => {
       if (author) query.where("articles.author", "=", author);
       if (topic) query.where({ topic });
@@ -53,18 +53,18 @@ const selectArticlesById = article_id => {
 };
 
 const newUpdatedVote = (article_id, votes = 0) => {
-  if (typeof votes == "number" || !votes)
+  if (typeof votes !== "number") return Promise.reject({ code: 400 });
+  else
     return connection("articles")
       .increment({ votes })
       .into("articles")
       .where({ article_id })
       .returning("*");
-  else return Promise.reject({ code: 400, msg: "this is not a number" });
 };
 
 const selectCommentsById = (
   article_id,
-  { sort_by = "created_at", order = "desc" }
+  { sort_by = "created_at", order = "desc", limit = 10, p = 1 }
 ) => {
   if (order !== "asc" && order !== "desc" && order !== undefined)
     return Promise.reject({ code: 400 });
@@ -73,6 +73,8 @@ const selectCommentsById = (
       .select("*")
       .where({ article_id })
       .orderBy(sort_by, order)
+      .limit(limit)
+      .offset((p - 1) * limit)
       .from("comments")
       .returning("*");
 };

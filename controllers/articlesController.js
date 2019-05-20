@@ -3,18 +3,23 @@ const {
   selectArticlesById,
   newUpdatedVote,
   selectCommentsById,
-  postNewComment
+  postNewComment,
+  getCountOfArticles
 } = require("../models/articlesModel");
 const { selectUsersByUsername } = require("../models/usersModel");
 const { selectTopicsBySlug } = require("../models/topicsModel");
 
 exports.getArticles = (req, res, next) => {
   const { author, topic } = req.query;
+
   if (!author && !topic) {
     selectArticles(req.query)
       .then(articles => {
+        return Promise.all([getCountOfArticles(), articles]);
+      })
+      .then(([count, articles]) => {
         if (articles.length < 1) return Promise.reject({ code: 404 });
-        res.status(200).send({ articles });
+        res.status(200).send({ total_count: count, articles });
       })
       .catch(next);
   } else
@@ -31,8 +36,11 @@ exports.getArticles = (req, res, next) => {
         else return selectArticles(req.query);
       })
       .then(articles => {
+        return Promise.all([getCountOfArticles(), articles]);
+      })
+      .then(([count, articles]) => {
         if (!articles) return Promise.reject({ code: 404 });
-        else res.status(200).send({ articles });
+        else res.status(200).send({ total_count: count, articles });
       })
       .catch(next);
 };

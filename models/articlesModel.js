@@ -19,6 +19,7 @@ const selectArticles = ({
       "articles.created_at",
       "articles.votes"
     )
+
     .count("comments.article_id as comment_count")
     .leftJoin("comments", "articles.article_id", "=", "comments.article_id")
     .groupBy("articles.article_id")
@@ -26,9 +27,19 @@ const selectArticles = ({
     .orderBy(sort_by, order)
     .limit(limit)
     .offset((p - 1) * limit)
+
     .where(query => {
       if (author) query.where("articles.author", "=", author);
       if (topic) query.where({ topic });
+    });
+};
+
+const getCountOfArticles = () => {
+  return connection("articles")
+    .count()
+    .first()
+    .then(count => {
+      return Number(count.count);
     });
 };
 
@@ -91,5 +102,6 @@ module.exports = {
   selectArticlesById,
   newUpdatedVote,
   selectCommentsById,
-  postNewComment
+  postNewComment,
+  getCountOfArticles
 };

@@ -46,6 +46,7 @@ describe.only("/api", () => {
         .get("/api/articles")
         .expect(200)
         .then(({ body }) => {
+          expect(body.total_count).to.eql(12);
           expect(body.articles).to.have.lengthOf(10);
           expect(body.articles).to.be.descendingBy("created_at");
           expect(body.articles[0]).to.contain.keys(
@@ -69,6 +70,14 @@ describe.only("/api", () => {
           });
         });
     });
+    it("GET all al articles includes a key of total count of articles and all arfticles key", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).to.have.keys("total_count", "articles");
+        });
+    });
     it("GET status 200, accepts a p query with a default limit of 10 returns 10 articles", () => {
       return request(app)
         .get("/api/articles?p=1")
@@ -83,6 +92,8 @@ describe.only("/api", () => {
         .get("/api/articles?sort_by=article_id")
         .expect(200)
         .then(({ body }) => {
+          expect(body.total_count).to.eql(12);
+
           expect(body.articles).to.be.descendingBy("article_id");
 
           expect(body.articles[0]).to.eql({
@@ -101,6 +112,8 @@ describe.only("/api", () => {
         .get("/api/articles?sort_by=article_id&order=asc")
         .expect(200)
         .then(({ body }) => {
+          expect(body.total_count).to.eql(12);
+
           expect(body.articles).to.be.ascendingBy("article_id");
           expect(body.articles[9]).to.eql({
             author: "rogersop",

@@ -69,6 +69,14 @@ describe.only("/api", () => {
           });
         });
     });
+    it("GET status 200, accepts a p query with a default limit of 10 returns 10 articles", () => {
+      return request(app)
+        .get("/api/articles?p=1")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).to.have.lengthOf(10);
+        });
+    });
 
     it("GET returns status 200 and articles sorted by the article_id key in descending order", () => {
       return request(app)
@@ -219,6 +227,14 @@ describe.only("/api", () => {
             body:
               "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky."
           });
+        });
+    });
+    it("GET status 200, accepts a p query with a default limit of 10 returns 10 comments for a particular article", () => {
+      return request(app)
+        .get("/api/articles?p=1")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).to.have.lengthOf(10);
         });
     });
     it("GET 200 an empty array when passed a article ID which has no comments", () => {

@@ -6,7 +6,7 @@ const { handle404, handle400, handle500 } = require("./errors");
 const app = express();
 
 app.use(express.json());
-app.use(corse());
+app.use(cors());
 app.use("/api", apiRouter);
 
 app.use(handle400);

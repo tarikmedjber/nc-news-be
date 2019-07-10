@@ -24,7 +24,9 @@ or
 
 7. npm run seed:run
 
-8. To stop running the server user use ctrl + c
+8. npm start to run locally
+
+9. To stop running the server user use ctrl + c
 
 ## Prerequisites
 
@@ -49,7 +51,7 @@ Next you will need to install severale dev dependicies, remember the -D:
 
 e.g. npm i supertest -D
 
-You will also need to create a knexfile.js which will contain your configuration settings. This file should contain the following:
+You will also need to create a knexfile.js file which will contain your configuration settings. This file should contain the following:
 
 ```javascript
 const { DB_URL } = process.env;

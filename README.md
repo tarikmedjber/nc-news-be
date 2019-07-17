@@ -41,7 +41,7 @@ In order to get the development enviroment running you will need to install seve
 
 e.g. npm i express
 
-Next you will need to install severale dev dependicies, remember the -D:
+Next you will need to install several dev dependicies, remember the -D:
 
 - chai v4.2
 - chai-sorted v0.2
